@@ -1,36 +1,65 @@
 const express = require('express');
 const router = express.Router();
-const { Show } = require('../models/index');
+const {Show} = require('../models/index');
+const { check, validationResult } = require('express-validator');
 
-//creating endpoints
-
-// GET 
-router.get('/', async (req, res) => {
-    res.json( await Show.findAll())
+// all shows
+router.get('/',async(req,res)=>{
+    res.json(await Show.findAll())
 })
 
-// POST
-router.post('/', async (req, res) => {
-    await Show.create(req.body);
-    res.json( await Show.findAll() );
+//specific show
+router.get("/:id", async(req,res)=>{
+    res.json(await Show.findByPk(req.params.id))
 })
 
-// PUT
-router.put('/:id', async (req, res) => {
-    const newShowData = req.body;
-    const showToModify = await Show.findByPk(req.params.id);
-    await showToModify.update(newShowData);
-    res.send( await Show.findAll() );
-})
-
-// DELETE
-router.delete('/:id', async (res, req) => {
-    await Show.destroy({
-        where: {
-            id: req.params.id
+//get shows from genre
+router.get("/genres/:genre",async(req,res)=>{
+    res.send(await Show.findAll({
+        where:{
+            genre:req.params.genre
         }
+    }))
+})
+
+//update show rating
+router.put("/:id/watched", [check('rating').trim().not().isEmpty()],async(req,res)=>{
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        res.send({error:errors.array()})
+    }
+    else{watchedShow = await Show.findByPk(req.params.id)
+    watchedShow.update({
+        rating:req.body.rating
     });
-    res.send( await Show.findAll());
+    res.send(await Show.findAll())}
+    
+})
+
+//update status of the show
+router.put('/:id/updates',[
+    check('status').trim().not().isEmpty(),
+    check('status').isLength({min:5,max:25})
+    ],
+    async(req,res)=>{
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            res.send({error:errors.array()})
+        }
+        else{updateShow = await Show.findByPk(req.params.id)
+        updateShow.update({
+            status:req.body.status
+        });
+        res.send(await Show.findAll())}
+        
+    })
+
+//delete show
+router.delete('/:id',async(req,res)=>{
+    showToDelete = await Show.findByPk(req.params.id);
+    await showToDelete.destroy();
+    res.send("here")
+    //res.send(await Show.findAll())
 })
 
 module.exports = router;
