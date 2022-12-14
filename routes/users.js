@@ -1,36 +1,31 @@
 const express = require('express');
-const router = express.router();
-const { Users } = require('../models/index');
+const router = express.Router();
+const { User, Show } = require('../models/index');
 
-//creating endpoints
-
-// GET 
-router.get('/', async (req, res) => {
-    res.send( await Users.findAll())
+// returns all users
+router.get('/',async(req,res)=>{
+    res.json(await User.findAll())
 })
 
-// POST
-router.post('/', async (req, res) => {
-    await Users.create(req.body);
-    res.json( await Users.findAll() );
+// returns user with id
+router.get("/:id", async(req,res)=>{
+    res.json(await User.findByPk(req.params.id))
 })
 
-// PUT
-router.put('/:id', async (req, res) => {
-    const newUserData = req.body;
-    const userToModify = await Users.findByPk(req.params.id);
-    await userToModify.update(newUserData);
-    res.json( await Users.findAll() );
+// returns user's shows
+router.get("/:id/shows", async(req,res)=>{
+    //someUser.getShows
+    someUser = await User.findByPk(req.params.id)
+    res.json(await someUser.getShows())
 })
 
-// DELETE
-router.delete('/:id', async (res, req) => {
-    await Users.destroy({
-        where: {
-            id: req.params.id
-        }
-    });
-    res.json( await Users.findAll());
+//add show to user once watched
+router.put('/:userId/shows/:showId', async(req,res)=>{
+    thisUser = await User.findByPk(req.params.userId);
+    someShow = await Show.findByPk(req.params.showId)
+    await thisUser.addShow(someShow)
+    //res -- all shows of that user has
+    res.send(await thisUser.getShows())
 })
 
 module.exports = router;

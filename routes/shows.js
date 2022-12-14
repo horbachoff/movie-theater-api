@@ -1,36 +1,36 @@
 const express = require('express');
-const router = express.router();
-const { Shows } = require('../models/index');
+const router = express.Router();
+const { Show } = require('../models/index');
 
 //creating endpoints
 
 // GET 
 router.get('/', async (req, res) => {
-    res.send( await Shows.findAll())
+    res.json( await Show.findAll())
 })
 
 // POST
 router.post('/', async (req, res) => {
-    await Shows.create(req.body);
-    res.json( await Shows.findAll() );
+    await Show.create(req.body);
+    res.json( await Show.findAll() );
 })
 
 // PUT
 router.put('/:id', async (req, res) => {
     const newShowData = req.body;
-    const showToModify = await Shows.findByPk(req.params.id);
-    await showToModify.update(newShowrData);
-    res.json( await Shows.findAll() );
+    const showToModify = await Show.findByPk(req.params.id);
+    await showToModify.update(newShowData);
+    res.send( await Show.findAll() );
 })
 
 // DELETE
 router.delete('/:id', async (res, req) => {
-    await Shows.destroy({
+    await Show.destroy({
         where: {
             id: req.params.id
         }
     });
-    res.json( await Shows.findAll());
+    res.send( await Show.findAll());
 })
 
 module.exports = router;

@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 const port = 3000;
 const { db } = require('./db');
-const usersRouter = require("./routes/users");
-const showsRouter = require("./routes/shows");
+const userRouter = require("./routes/users");
+const showRouter = require("./routes/shows");
 
 //middleare
 app.use(express.json());
@@ -14,8 +14,8 @@ app.get('/', (req, res) => {
     res.send("The root path GET endpoint works.")
 })
 
-app.use('/users', usersRouter);
-app.use('/shows', showsRouter);
+app.use('/users', userRouter);
+app.use('/shows', showRouter);
 
 //starting a server
 app.listen(port, () => {
